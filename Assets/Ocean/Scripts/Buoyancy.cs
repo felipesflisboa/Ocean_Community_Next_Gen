@@ -91,10 +91,11 @@ public class Buoyancy : MonoBehaviour {
         ocean = Ocean.Singleton;
 		
 		rrigidbody.centerOfMass = new Vector3 (0.0f, CenterOfMassOffset, 0.0f);
-	
-		Vector3 bounds = GetComponent<BoxCollider> ().size;
 
-		float length = bounds.z;
+        //Vector3 bounds = GetComponent<BoxCollider> ().size; //mod
+        Vector3 bounds = GetComponentInChildren<Collider>().bounds.size; //mod
+
+        float length = bounds.z;
 		float width = bounds.x;
 
 		blobs = new List<Vector3> ();

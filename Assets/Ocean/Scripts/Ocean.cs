@@ -1802,8 +1802,8 @@ public class Ocean : MonoBehaviour {
 		return MySmoothstep(prevValue, nextValue, frac);
 	}
 
-	//should use a pooling system
-	IEnumerator AddMist () {
+    //should use a pooling system
+    IEnumerator AddMist () {
 		while(true){
 			if(player != null && mistEnabled && isBoat){
 				Vector3 pos = new Vector3(player.transform.position.x + UnityEngine.Random.Range(-30, 30), player.transform.position.y + 5, player.transform.position.z + UnityEngine.Random.Range(-30, 30));
@@ -1977,19 +1977,35 @@ public class Ocean : MonoBehaviour {
 		int f1 = width * fy;
 		int f2 = width * cy;
 
-		float FFd = data[f1 + fx].Re * fact;
-		float CFd = data[f1 + cx].Re * fact;
-		float CCd = data[f2 + cx].Re * fact;
-		float FCd = data[f2 + fx].Re * fact;
-   
-		//interp across x's
-		float xs = x - fx;
+        //mod
+        //float FFd = data[f1 + fx].Re * fact;
+        //float CFd = data[f1 + cx].Re * fact;
+        //float CCd = data[f2 + cx].Re * fact;
+        //float FCd = data[f2 + fx].Re * fact;
+
+        //mod
+        float FFd = TryToGetValFromData("FFd", f1 + fx) * fact;
+        float CFd = TryToGetValFromData("CFd", f1 + cx) * fact;
+        float CCd = TryToGetValFromData("CCd", f2 + cx) * fact;
+        float FCd = TryToGetValFromData("FCd", f2 + fx) * fact;
+
+        //interp across x's
+        float xs = x - fx;
 		h1 = Lerp(FFd, CFd, xs);
 		h2 = Lerp(FCd, CCd, xs);
 
 		//interp across y
 		return Lerp(h1, h2, y - fy);
 	}
+
+    //mod
+    float TryToGetValFromData(string variableName, int index) {
+        if (index >= data.Length) {
+            Debug.LogWarningFormat("{2} trying to access index {0} on array of size {1}", index, data.Length, variableName);
+            return 0;
+        }
+        return data[index].Re;
+    }
  
 	//more accurate but slower
 	public float GetChoppyAtLocation2 (float x, float y) {

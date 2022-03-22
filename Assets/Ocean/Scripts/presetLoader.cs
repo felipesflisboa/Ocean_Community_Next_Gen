@@ -16,17 +16,17 @@ public class presetLoader : MonoBehaviour {
 		#endif
 	}
 
-	public static bool readPreset(Ocean o, string preset, bool runtime = false, bool useFixedGaussianRandTable = false) {
+    //mod
+    public static bool readPreset(Ocean o, string preset, bool runtime = false, bool useFixedGaussianRandTable = false) {
+        bool ret = false;
+#if NATIVE
+        uocean._setFixedRandomTable(false, 0, null, null);
+#endif
 
+        //ios: path = Application.dataPath + "/Raw";
+        //android: path = "jar:file://" + Application.dataPath + "!/assets/";
 
-		#if NATIVE
-		uocean._setFixedRandomTable(false, 0, null, null);
-		#endif
-
-		//ios: path = Application.dataPath + "/Raw";
-		//android: path = "jar:file://" + Application.dataPath + "!/assets/";
-
-		#if !UNITY_EDITOR && UNITY_ANDROID
+#if !UNITY_EDITOR && UNITY_ANDROID
 			WWW wt = new WWW(preset);
 			while(!wt.isDone){}
 
@@ -41,16 +41,80 @@ public class presetLoader : MonoBehaviour {
 				Debug.Log("Could not find preset in Streaming Assets folder");
 				return false;
 			}
-		#endif
+#endif
+        using (FileStream fs = new FileStream(preset, FileMode.Open, FileAccess.Read)) {
+            if (fs == null)
+                return false;
+            using (BinaryReader br = new BinaryReader(fs)) {
+                if (br == null)
+                    return false;
+                ret = readPreset(o, br, runtime, useFixedGaussianRandTable);
+            }
+        }
+        return ret;
+    }
+
+    //mod
+    public static bool readPreset(Ocean o, BinaryReader br, bool runtime = false, bool useFixedGaussianRandTable = false) {
+#if NATIVE
+        uocean._setFixedRandomTable(false, 0, null, null);
+#endif
+
+        //ios: path = Application.dataPath + "/Raw";
+        //android: path = "jar:file://" + Application.dataPath + "!/assets/";
+
+#if !UNITY_EDITOR && UNITY_ANDROID
+			WWW wt = new WWW(preset);
+			while(!wt.isDone){}
+
+			string filename = Path.GetFileName(preset);
+			string destination = Application.persistentDataPath + "/" + filename;
+
+			if(wt.error == null) {
+				if (File.Exists(destination)) File.Delete(destination);
+				File.WriteAllBytes(destination, wt.bytes);
+				preset = destination;
+			}else {
+				Debug.Log("Could not find preset in Streaming Assets folder");
+				return false;
+			}
+#endif
+        /* //mod
+        public static bool readPreset(Ocean o, string preset, bool runtime = false, bool useFixedGaussianRandTable = false) {
 
 
-		FileStream fs = new FileStream(preset, FileMode.Open, FileAccess.Read);
+            #if NATIVE
+            uocean._setFixedRandomTable(false, 0, null, null);
+            #endif
+
+            //ios: path = Application.dataPath + "/Raw";
+            //android: path = "jar:file://" + Application.dataPath + "!/assets/";
+
+            #if !UNITY_EDITOR && UNITY_ANDROID
+                WWW wt = new WWW(preset);
+                while(!wt.isDone){}
+
+                string filename = Path.GetFileName(preset);
+                string destination = Application.persistentDataPath + "/" + filename;
+
+                if(wt.error == null) {
+                    if (File.Exists(destination)) File.Delete(destination);
+                    File.WriteAllBytes(destination, wt.bytes);
+                    preset = destination;
+                }else {
+                    Debug.Log("Could not find preset in Streaming Assets folder");
+                    return false;
+                }
+            #endif
+
+        FileStream fs = new FileStream(preset, FileMode.Open, FileAccess.Read);
 		if (fs == null) return false;
 
 		BinaryReader br = new BinaryReader(fs);
 		if (br == null) { fs.Close(); return false; }
+        */
 
-		int ct = o.tiles;
+        int ct = o.tiles;
 		float cx = o.size.x;
 		float cz = o.size.z;
 		int cwh = o.width;
@@ -290,8 +354,10 @@ public class presetLoader : MonoBehaviour {
 			}
 		}
 
+        /* //mod
 		br.Close();
 		fs.Close();
+        */
 
 		if(Application.isPlaying) o.initDisc();
 

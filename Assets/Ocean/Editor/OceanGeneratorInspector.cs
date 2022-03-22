@@ -93,8 +93,9 @@ public class OceanGeneratorInspector : Editor {
 				if(!dp[i].Contains(".meta") && dp[i].Contains(".preset")) {
 					k++;
 					presetpaths[k] = dp[i];
-					presets[k+1] = Path.GetFileName(dp[i]).Replace(".preset","");
-					if (presets[k+1] == ocean._name) {  currentPreset = k+1; oldpreset = currentPreset;}
+                    //presets[k+1] = Path.GetFileName(dp[i]).Replace(".preset",""); //mod
+                    presets[k+1] = Path.GetFileName(dp[i]).Replace(".preset", "").Replace(".bytes", ""); //mod
+                    if (presets[k+1] == ocean._name) {  currentPreset = k+1; oldpreset = currentPreset;}
 				}
 			}
 			dp=null;
@@ -108,9 +109,10 @@ public class OceanGeneratorInspector : Editor {
 		oldmodeset = ocean._gaussianMode;
 
 		var script = MonoScript.FromScriptableObject( this );
-		presetPath = Path.GetDirectoryName( AssetDatabase.GetAssetPath( script ))+"/_OceanPresets";
+        // presetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(script)) + "/_OceanPresets"; //mod
+        presetPath = Path.GetDirectoryName(AssetDatabase.GetAssetPath(script)) + "/../_OceanPresets"; //mod
 
-		checkPdir(ocean);
+        checkPdir(ocean);
 
 		//Load dynamic resources
 		string pluginPath = FilePathToAssetPath( GetPluginPath() );
@@ -205,13 +207,15 @@ public class OceanGeneratorInspector : Editor {
 
 			EditorGUILayout.BeginHorizontal();
 			if (GUILayout.Button("Load preset")) {
-				string preset = EditorUtility.OpenFilePanel("Load Ocean preset",presetPath,"preset");
+				string preset = EditorUtility.OpenFilePanel("Load Ocean preset",presetPath,"preset.bytes"); //mod
+                // string preset = EditorUtility.OpenFilePanel("Load Ocean preset", presetPath, "preset"); //mod
 
-				if (preset != null) {
+                if (preset != null) {
 					if (preset.Length > 0) {
 						presetLoader.loadPreset(ocean, preset,EditorApplication.isPlaying);
-						title = Path.GetFileName(preset).Replace(".preset", ""); ocean._name = title;
-						updcurPreset();
+						// title = Path.GetFileName(preset).Replace(".preset", ""); ocean._name = title; //mod
+                        title = Path.GetFileName(preset).Replace(".preset", "").Replace(".bytes", ""); ocean._name = title;
+                        updcurPreset();
 						checkOceanWidth(ocean);
 						oldRenderRefraction=ocean.renderRefraction;
 						EditorUtility.SetDirty(ocean);
@@ -1080,12 +1084,14 @@ public class OceanGeneratorInspector : Editor {
 
 	private static void savePreset(Ocean ocean) {
 		if (!Directory.Exists(presetPath)) Directory.CreateDirectory(presetPath);
-		string preset = EditorUtility.SaveFilePanel("Save Ocean preset", presetPath,"","preset");
+        //string preset = EditorUtility.SaveFilePanel("Save Ocean preset", presetPath, "", "preset"); //mod
+        string preset = EditorUtility.SaveFilePanel("Save Ocean preset", presetPath,"","preset.bytes"); //mod
 
-		if (preset != null) {
+        if (preset != null) {
 			if (preset.Length > 0) {
-				title = Path.GetFileName(preset).Replace(".preset", ""); ocean._name = title;
-				updcurPreset();
+                //title = Path.GetFileName(preset).Replace(".preset", ""); ocean._name = title; //mod
+                title = Path.GetFileName(preset).Replace(".preset", "").Replace(".bytes", ""); ocean._name = title; //mod
+                updcurPreset();
 				using (BinaryWriter swr = new BinaryWriter(File.Open(preset, FileMode.Create))) {
 					swr.Write(ocean.followMainCamera);//bool
 					swr.Write(ocean.ifoamStrength);//float
@@ -1194,8 +1200,8 @@ public class OceanGeneratorInspector : Editor {
 						}
 					}
 				}
-
-			}
+                AssetDatabase.Refresh(); //mod
+            }
 		}
 	}
 

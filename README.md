@@ -1,3 +1,12 @@
+## Utility Edition
+
+- Presets works outside of StreamingAssets and Editor folders.
+- OceanPresetData class holds presets data.
+- OceanHelper dynamically load presets. Can load with a tween effect. 
+- MyBoyant class, a simple Boyant working without physics.
+
+---
+
 Minimum Version Required is Unity 5.6. Works with Untiy 2017.
 
 
