@@ -7,28 +7,29 @@ using UnityEngine;
 /// </summary>
 public class OceanTween {
     Ocean ocean;
+    OceanTweenRunner tweenRunner;
     OceanPresetData lastData;
     OceanPresetData newData;
-    public bool InProgress { get; private set; }
+    internal bool finished;
     
-    public void Setup(Ocean pOcean, OceanPresetData pLastData, OceanPresetData pNewData) {
+    public OceanTween(Ocean pOcean, OceanTweenRunner pTweenRunner, OceanPresetData pLastData, OceanPresetData pNewData) {
         ocean = pOcean;
+        tweenRunner = pTweenRunner;
         lastData = pLastData;
         newData = pNewData;
         Start();
     }
 
-    public virtual void Start() {
-        InProgress = true;
+    public void Start() {
         newData.ToggleDirectValues();
-        //DOTween.To(SetterTweenData, 0f, 1f, 3f).SetEase(Ease.OutQuad).SetTarget(this).OnComplete(() => InProgress = false);
+        tweenRunner.Start(this);
     }
 
     /// <summary>
     /// Setter called on each frame.
     /// </summary>
     /// <param name="ratio">Tween ratio</param>
-    void SetterTweenData(float ratio) {
+    public void SetterTweenData(float ratio) {
         if (ocean == null)
             return;
         ocean.waterColor = LerpOnMaterials(lastData.waterColor, newData.waterColor, ratio, "_WaterColor");
@@ -90,7 +91,11 @@ public class OceanTween {
         return Mathf.Lerp(a, b, t);
     }
 
-    public virtual void Stop() {
-        //DOTween.Kill(this);
+    public void Update() {
+        tweenRunner.Update();
+    }
+
+    public void Stop() {
+        tweenRunner.Stop();
     }
 }

@@ -8,15 +8,19 @@ using UnityEngine.Assertions;
 /// <summary>
 /// Provides a helper to dynamically load presets. Can load with a tween effect.
 /// </summary>
-public class OceanHelper<TOceanTween> where TOceanTween : OceanTween, new() {
+public class OceanHelper {
 #pragma warning disable 162
     Ocean ocean;
+    OceanTweenRunner tweenRunner;
     OceanPresetData currentData;
     OceanTween lastTween;
 
-    const bool ENABLE_OCEAN_TWEEN = true;
-
-    public OceanHelper() {
+    /// <summary>
+    /// Class constructor
+    /// </summary>
+    /// <param name="pTweenRunner">Tween runner. When omitted, disable tweens.</param>
+    public OceanHelper(OceanTweenRunner pTweenRunner=null) {
+        tweenRunner = pTweenRunner;
         ocean = Ocean.Singleton;
     }
 
@@ -45,7 +49,7 @@ public class OceanHelper<TOceanTween> where TOceanTween : OceanTween, new() {
     }
 
     public void LoadOceanWithTween(TextAsset file) {
-        if (!ENABLE_OCEAN_TWEEN) {
+        if (tweenRunner==null) {
             Debug.LogWarning("Tween disabled. Loading ocean normally");
             LoadOcean(file);
             return;
@@ -66,13 +70,12 @@ public class OceanHelper<TOceanTween> where TOceanTween : OceanTween, new() {
         currentData = data;
         if (lastTween != null)
             lastTween.Stop();
-        lastTween = CreateTOceanTween(lastData, currentData);
+        lastTween = new OceanTween(ocean, tweenRunner, lastData, currentData);
     }
 
-    TOceanTween CreateTOceanTween(OceanPresetData lastData, OceanPresetData newData) {
-        TOceanTween ret = new TOceanTween();
-        ret.Setup(ocean, lastData, newData);
-        return ret;
+    public void Update() {
+        if (lastTween != null)
+            lastTween.Update();
     }
 
     void CheckOceanWidth() {
