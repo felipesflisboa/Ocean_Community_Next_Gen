@@ -6,12 +6,6 @@ using UnityEngine;
 /// Executes tween using linear progression.
 /// </summary>
 public class OceanLinearTweenRunner : OceanTweenRunner {
-    protected override bool UseUpdateCall {
-        get {
-            return true;
-        }
-    }
-
     protected override void StartTween() {}
 
     protected override void UpdateTween(float ratio) {

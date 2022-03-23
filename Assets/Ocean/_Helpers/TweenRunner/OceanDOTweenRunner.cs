@@ -4,17 +4,11 @@ using UnityEngine;
 
 /*
 public class OceanDOTweenRunner : OceanTweenRunner {
-    protected override bool UseUpdateCall {
-        get {
-            return false;
-        }
-    }
-
     protected override void StartTween() { 
-        DOTween.To(currentTween.SetterTweenData, 0f, 1f, duration).SetEase(Ease.OutQuad).SetTarget(this).OnComplete(() => finished = true);
+        DOTween.To(currentTween.SetterTweenData, 0f, 1f, duration).SetEase(Ease.OutQuad).SetTarget(currentTween);
     }
 
-    protected override void UpdateTween() {}
+    protected override void UpdateTween(float ratio) {}
 
     protected override void StopTween() {
         DOTween.Kill(this);

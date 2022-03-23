@@ -16,13 +16,6 @@ public abstract class OceanTweenRunner {
         }
     }
 
-    /// <summary>
-    /// When true, do update calculation.
-    /// </summary>
-    protected abstract bool UseUpdateCall {
-        get;
-    }
-
     public void Start(OceanTween tween) {
         currentTween = tween;
         startTime = Time.timeSinceLevelLoad;
@@ -32,7 +25,7 @@ public abstract class OceanTweenRunner {
     protected abstract void StartTween();
 
     public void Update() {
-        if (!UseUpdateCall || !Running)
+        if (!Running)
             return;
         float ratio = Mathf.Min(Time.timeSinceLevelLoad / (Time.timeSinceLevelLoad + duration), 1f);
         UpdateTween(ratio);
